@@ -2,3 +2,7 @@ azure-functions
 pytest
 python-dotenv
 twilio
+msgraph-sdk
+azure-identity
+pytz
+asyncio
