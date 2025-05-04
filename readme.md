@@ -38,7 +38,7 @@ http://localhost:7071/api/HttpExample?name=YourName
 To run the unit tests, use:
 
 ```bash
-PYTHONPATH=. pytest
+PYTHONPATH=. pytest --log-cli-level=INFO 
 ```
 
 Or, with unittest:

@@ -28,6 +28,16 @@ async def fetch_calendar_view(graph_client, user_id, request_config):
     logging.info(f"Calendar view value: {calendar_view}")
     return calendar_view
 
+def escape_xml(text):
+    """
+    Escapes <, >, and & for XML/TwiML.
+    """
+    return (
+        text.replace('&', '&amp;')
+            .replace('<', '&lt;')
+            .replace('>', '&gt;')
+    )
+
 def main(myTimer: func.TimerRequest) -> func.HttpResponse:
     logging.info('Python Timer trigger function processed a request.')
 
@@ -67,8 +77,7 @@ def main(myTimer: func.TimerRequest) -> func.HttpResponse:
         now = datetime.datetime.now(pytz.timezone("America/Los_Angeles"))
         start_date = now
         end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
-        logging.info(f"start_date: {start_date}")
-        logging.info(f"end_date: {end_date}")
+        logging.info(f"start_date: {start_date}, end_date: {end_date}")
 
         # Create query parameters for the calendar view request
         query_parameters = CalendarViewRequestBuilder.CalendarViewRequestBuilderGetQueryParameters(
@@ -104,8 +113,8 @@ def main(myTimer: func.TimerRequest) -> func.HttpResponse:
             
             for i, event in enumerate(calendar_view.value, 1):
                 # Extract and format event details
-                subject = event.subject or "(No subject)"
-                organizer = event.organizer.email_address.name if event.organizer and hasattr(event.organizer, 'email_address') else "Unknown"
+                subject = escape_xml(event.subject or "(No subject)")
+                organizer = escape_xml(event.organizer.email_address.name if event.organizer and hasattr(event.organizer, 'email_address') else "Unknown")
             
                 start_time_dt_pst = convert_to_pst(event.start.date_time)
                 start_time = start_time_dt_pst.strftime("%-I:%M %p")
@@ -113,14 +122,14 @@ def main(myTimer: func.TimerRequest) -> func.HttpResponse:
                 end_time_dt_pst = convert_to_pst(event.end.date_time)
                 end_time = end_time_dt_pst.strftime("%-I:%M %p %Z")
 
-                location = event.location.display_name if event.location.display_name else "No location"
+                location = escape_xml(event.location.display_name if event.location else "No location")
                 
                 # Create a Twilio message part for each event
                 parts.append("""<Pause length="1"/>""")
-                parts.append(f"<Say>Event {i}: {subject} </Say>")
-                parts.append(f"<Say>from {start_time} to {end_time}</Say>")
-                parts.append(f"<Say>located at {location}</Say>")
-                parts.append(f"<Say>organized by {organizer}</Say>")
+                parts.append(f"<Say>Event {i}</Say>")
+                parts.append(f"<Say>{subject}</Say>")
+                parts.append("""<Pause length="1"/>""")
+                parts.append(f"<Say>from {start_time} to {end_time} at {location} organized by {organizer}</Say>")
                 if event.is_all_day:
                     parts.append("""<Pause length="1"/>""")
                     parts.append(f"<Say>This is an all day event</Say>")
@@ -141,7 +150,7 @@ def main(myTimer: func.TimerRequest) -> func.HttpResponse:
 
         # Make the call
         call = client.calls.create(
-            twiml="".join(parts),
+            twiml=''.join(parts),
             to=recipient_number,
             from_=from_number,
         )

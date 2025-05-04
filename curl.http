@@ -4,3 +4,4 @@ curl -X POST \
 -H "x-functions-key: {{functionKey}}" \
 -H "Content-Type: application/json" \
 -d "{}"
+ 
