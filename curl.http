@@ -1,0 +1,7 @@
+# Trigger function
+curl -X POST \
+"https://jairovagent.azurewebsites.net/admin/functions/HttpExample" \
+-H "x-functions-key: {{functionKey}}" \
+-H "Content-Type: application/json" \
+-d "{}"
+
