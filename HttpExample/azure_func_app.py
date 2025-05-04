@@ -28,8 +28,8 @@ async def fetch_calendar_view(graph_client, user_id, request_config):
     logging.info(f"Calendar view value: {calendar_view}")
     return calendar_view
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+def main(myTimer: func.TimerRequest) -> func.HttpResponse:
+    logging.info('Python Timer trigger function processed a request.')
 
     try:
         # Get Twilio credentials from app settings (environment variables)
@@ -94,37 +94,47 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Step 3: Process and display the events
         parts = []
         parts.append("<Response>")
+        parts.append("""<Pause length="1"/>""")
+        todaysDate = now.strftime("%a %b %d")
+        parts.append(f"<Say>Hello Ramon!, this is Jairo Calendar Assistant. Here are your events for {todaysDate}.</Say>")
+       
         if hasattr(calendar_view, 'value') and calendar_view.value:
             parts.append("""<Pause length="1"/>""")
-            parts.append(f"<Say>Retrieved {len(calendar_view.value)} calendar events.</Say>")
+            parts.append(f"<Say>You have {len(calendar_view.value)} calendar event(s).</Say>")
+            
             for i, event in enumerate(calendar_view.value, 1):
-                
                 # Extract and format event details
                 subject = event.subject or "(No subject)"
                 organizer = event.organizer.email_address.name if event.organizer and hasattr(event.organizer, 'email_address') else "Unknown"
-                
+            
                 start_time_dt_pst = convert_to_pst(event.start.date_time)
-                start_time = start_time_dt_pst.strftime("%Y-%m-%d %H:%M:%S %Z")
+                start_time = start_time_dt_pst.strftime("%-I:%M %p")
 
                 end_time_dt_pst = convert_to_pst(event.end.date_time)
-                end_time = end_time_dt_pst.strftime("%Y-%m-%d %H:%M:%S %Z")
+                end_time = end_time_dt_pst.strftime("%-I:%M %p %Z")
 
-                location = event.location.display_name if event.location else "No location"
+                location = event.location.display_name if event.location.display_name else "No location"
                 
                 # Create a Twilio message part for each event
                 parts.append("""<Pause length="1"/>""")
-                parts.append("<Say>")
-                parts.append(f"Event {i}: {subject} from {start_time} to {end_time} at {location} organized by {organizer}")
+                parts.append(f"<Say>Event {i}: {subject} </Say>")
+                parts.append(f"<Say>from {start_time} to {end_time}</Say>")
+                parts.append(f"<Say>located at {location}</Say>")
+                parts.append(f"<Say>organized by {organizer}</Say>")
                 if event.is_all_day:
-                    print("this is an all day event")
+                    parts.append("""<Pause length="1"/>""")
+                    parts.append(f"<Say>This is an all day event</Say>")
                 if event.importance and event.importance != 'normal':
-                    print(f"Importance: {event.importance}")
-                parts.append("</Say>")
+                    parts.append("""<Pause length="1"/>""")
+                    parts.append(f"<Say>Importance: {event.importance}</Say>")
         else:
             parts.append("""<Pause length="1"/>""")
             parts.append("<Say>No events found in the specified time range.</Say>")
+
+        parts.append("""<Pause length="1"/>""")
+        parts.append("<Say>Thank you for using Jairo Calendar Assistant.</Say>")    
         parts.append("</Response>")
-        logging.info(f"parts: {''.join(parts)}")
+        logging.info(f"parts: {json.dumps(parts, indent=2)}")
 
         # Create Twilio client
         client = Client(account_sid, auth_token)
@@ -135,6 +145,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             to=recipient_number,
             from_=from_number,
         )
+
         return func.HttpResponse(
             json.dumps({"success": True, "call_sid": call.sid}),
             mimetype="application/json",
