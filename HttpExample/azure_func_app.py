@@ -96,7 +96,7 @@ def main(myTimer: func.TimerRequest) -> func.HttpResponse:
         parts.append("<Response>")
         parts.append("""<Pause length="1"/>""")
         todaysDate = now.strftime("%a %b %d")
-        parts.append(f"<Say>Hello Ramon!, this is Jairo Calendar Assistant. Here are your events for {todaysDate}.</Say>")
+        parts.append(f"<Say>Hello Ramon!, this is MK. Here are your events for {todaysDate}.</Say>")
        
         if hasattr(calendar_view, 'value') and calendar_view.value:
             parts.append("""<Pause length="1"/>""")
@@ -132,7 +132,7 @@ def main(myTimer: func.TimerRequest) -> func.HttpResponse:
             parts.append("<Say>No events found in the specified time range.</Say>")
 
         parts.append("""<Pause length="1"/>""")
-        parts.append("<Say>Thank you for using Jairo Calendar Assistant.</Say>")    
+        parts.append("<Say>Thank you for using MK your friendly AI Agent.</Say>")    
         parts.append("</Response>")
         logging.info(f"parts: {json.dumps(parts, indent=2)}")
 
