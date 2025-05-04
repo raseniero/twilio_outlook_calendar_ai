@@ -1,0 +1,35 @@
+# Ignore Python virtual environments
+.venv/
+
+# Ignore Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local build artifacts
+.python_packages/
+
+# Ignore test files and folders
+tests/
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore local settings and environment files
+local.settings.json
+.env
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore HTTP request files
+curl.http
+curl.rest
+
+# Ignore project documentation
+readme.md 
