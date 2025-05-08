@@ -24,6 +24,7 @@ pip install -r requirements.txt
 You can use the Azure Functions Core Tools to run the function locally:
 
 ```bash
+cd HttpExample
 func start
 ```
 
@@ -35,7 +36,7 @@ http://localhost:7071/api/HttpExample?name=YourName
 
 ## 4. Test the Project
 
-To run the unit tests, use:
+To run the unit tests, make sure you are in the root directory, use:
 
 ```bash
 PYTHONPATH=. pytest --log-cli-level=INFO 

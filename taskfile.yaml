@@ -1,0 +1,21 @@
+version: "3"
+
+vars:
+  VENV: ".venv"
+  PYTHON: "/usr/bin/python3"
+  REQUIREMENTS: "requirements.txt"
+
+tasks:
+  init:
+    desc: "Initialize project with virtual environment and install requirements.txt"
+    cmds:
+      - "python3 -m venv .venv"
+      - "source .venv/bin/activate"
+      - "pip install --upgrade pip"
+      - "pip install -r requirements.txt"
+
+  run:
+    desc: "Run the Azure Function locally"
+    cmds:
+      - "func start"
+  
