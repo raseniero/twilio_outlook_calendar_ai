@@ -5,8 +5,8 @@ This project demonstrates a simple Azure Function (HTTP trigger) in Python.
 ## 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd twilio_azure_function
+git clone twilio_outlook_calendar_ai
+cd twilio_outlook_calendar_ai
 ```
 
 ## 2. Set Up the Local Development Environment
